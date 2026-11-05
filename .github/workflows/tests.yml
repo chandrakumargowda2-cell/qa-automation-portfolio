@@ -1,51 +1,67 @@
+
 name: QA Automation
+
 on:
   push:
-    branches: [ main, master ]
+    branches: [main, master]
   pull_request:
   workflow_dispatch:
+
 jobs:
+
   api-tests:
     runs-on: ubuntu-latest
+
     steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-python@v5
-        with: { python-version: "3.11", cache: pip }
-      - run: python -m pip install --upgrade pip && pip install -r requirements.txt
-      - run: pytest -m api -v
-  
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: Run API tests
+        run: pytest -m api -v
+
   ui-tests:
-  runs-on: ubuntu-latest
+    runs-on: ubuntu-latest
 
-  env:
-    HEADLESS: "true"
+    env:
+      HEADLESS: "true"
 
-  steps:
-    - name: Checkout repository
-      uses: actions/checkout@v4
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
 
-    - name: Set up Python
-      uses: actions/setup-python@v5
-      with:
-        python-version: "3.11"
-        cache: pip
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+          cache: pip
 
-    - name: Install dependencies
-      run: |
-        python -m pip install --upgrade pip
-        pip install -r requirements.txt
-        playwright install --with-deps chromium
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+          playwright install --with-deps chromium
 
-    - name: Run UI tests
-      run: pytest -m ui -v
+      - name: Run UI tests
+        run: pytest -m ui -v
 
-    - name: Upload UI artifacts
-      if: always()
-      uses: actions/upload-artifact@v4
-      with:
-        name: ui-test-artifacts
-        path: |
-          reports/
-          screenshots/
-          traces/
-        if-no-files-found: ignore
+      - name: Upload UI artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ui-test-artifacts
+          path: |
+            reports/
+            screenshots/
+            traces/
+          if-no-files-found: ignore
