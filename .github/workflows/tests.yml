@@ -15,7 +15,7 @@ jobs:
       - run: pytest -m api -v
   ui-tests:
     runs-on: ubuntu-latest
-    env: HEADLESS: false
+    env: HEADLESS: true
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5

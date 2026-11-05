@@ -5,7 +5,7 @@ import pytest
 import os
 from playwright.sync_api import sync_playwright
 from api.api_client import ApiClient
-from config.settings import BASE_URL, BROWSER, DEFAULT_TIMEOUT, HEADLESS, SLOW_MO
+from config.settings import BASE_URL, BROWSER, DEFAULT_TIMEOUT, HEADLESS, SLOW_MO, IS_CI
 
 for folder in ("reports", "screenshots", "traces"):
     Path(folder).mkdir(exist_ok=True)
