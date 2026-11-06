@@ -75,7 +75,8 @@ Run a reasonable number of tests; do not load-test the public site. Use syntheti
 ## Author
 **Chandrakumar T S** — QA Automation | Python | Playwright | Pytest | API Testing
 
-Add your LinkedIn and GitHub profile URLs here before publishing.
+LinkedIn - https://www.linkedin.com/in/chandrakumar-t-s/
+GitHub - https://github.com/chandrakumargowda2-cell/qa-automation-portfolio
 
 ## Suggested extensions
 Allure, accessibility checks, visual regression, contract/schema validation, cross-browser CI, database validation against a suitable demo backend, and historical test reporting.
