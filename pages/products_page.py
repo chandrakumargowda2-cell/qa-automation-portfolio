@@ -9,8 +9,11 @@ class ProductsPage(BasePage):
         self.searched_heading = page.get_by_role("heading", name="Searched Products")
         self.cards = page.locator(".product-image-wrapper")
     def verify_catalog(self):
-        expect(self.heading).to_be_visible(); expect(self.cards.first).to_be_visible()
+        expect(self.heading).to_be_visible(); 
+        expect(self.cards.first).to_be_visible()
     def search(self, keyword):
-        self.search_input.fill(keyword); self.search_button.click()
+        self.search_input.fill(keyword); 
+        self.search_button.click()
     def verify_search_results(self):
-        expect(self.searched_heading).to_be_visible(); expect(self.cards.first).to_be_visible()
+        expect(self.searched_heading).to_be_visible(); 
+        expect(self.cards.first).to_be_visible()

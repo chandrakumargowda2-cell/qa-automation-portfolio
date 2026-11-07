@@ -57,6 +57,8 @@ BROWSER=firefox pytest -m ui -v  # after playwright install firefox
 | UI | Product catalogue visible |
 | UI | Search products |
 | UI | Invalid login rejected |
+| UI | Test Cases Page Visible |
+| UI | Contact Us Page Visible |
 | API | GET products and validate collection |
 | API | GET brands and validate collection |
 | API | Search products |

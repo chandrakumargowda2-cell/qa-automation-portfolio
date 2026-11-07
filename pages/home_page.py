@@ -10,5 +10,7 @@ class HomePage(BasePage):
     def verify_loaded(self):
         expect(self.page).to_have_title(re.compile("Automation", re.IGNORECASE))
         expect(self.logo).to_be_visible()
-    def go_to_products(self): self.products_link.click()
-    def go_to_login(self): self.login_link.click()
+    def go_to_products(self): 
+        self.products_link.click()
+    def go_to_login(self): 
+        self.login_link.click()

@@ -10,7 +10,8 @@ from config.settings import BASE_URL, BROWSER, DEFAULT_TIMEOUT, HEADLESS, SLOW_M
 for folder in ("reports", "screenshots", "traces"):
     Path(folder).mkdir(exist_ok=True)
 
-def pytest_addoption(parser): parser.addoption("--app-url", action="store", default=BASE_URL)
+def pytest_addoption(parser): 
+    parser.addoption("--app-url", action="store", default=BASE_URL)
 
 def pytest_configure(config):
     stamp = datetime.now().strftime("%Y%m%d_%H%M%S_%f")
@@ -28,6 +29,11 @@ def playwright_instance():
 def browser_instance(playwright_instance):
 
     browser_name = os.getenv("BROWSER", BROWSER).lower()
+
+    #validate browser name
+    supported_browsers = ["chromium", "firefox", "webkit"]
+    if browser_name not in supported_browsers:
+        raise ValueError(f"Unsupported browser: {browser_name}. Choose from: {supported_browsers}")
 
     headless_value = os.getenv(
         "HEADLESS", str(HEADLESS)
@@ -49,19 +55,54 @@ def browser_instance(playwright_instance):
         slow_mo=SLOW_MO
     )
 
-    yield browser
+    try:
+        yield browser
+    finally:
+        browser.close()
 
-    browser.close()
 
 @pytest.fixture
 def context(browser_instance):
-    ctx = browser_instance.new_context(viewport={"width": 1440, "height": 900})
+
+    ctx = browser_instance.new_context(
+        viewport={"width": 1440, "height": 900}
+    )
+
+    # Block common advertising requests
+    ad_domains = (
+        "doubleclick.net",
+        "googlesyndication.com",
+        "googletagservices.com",
+        "googleadservices.com",
+        "google.com/pagead",
+    )
+
+    def block_ads(route):
+        request_url = route.request.url.lower()
+
+        if any(domain in request_url for domain in ad_domains):
+            route.abort()
+        else:
+            route.continue_()
+
+    ctx.route("**/*", block_ads)
+
+    # Set default timeout
     ctx.set_default_timeout(DEFAULT_TIMEOUT)
-    ctx.tracing.start(screenshots=True, snapshots=True, sources=True)
-    yield ctx
-    try: ctx.tracing.stop()
-    except Exception: pass
-    ctx.close()
+
+    # Start tracing
+    ctx.tracing.start(
+        screenshots=True,
+        snapshots=True,
+        sources=True
+    )
+
+    try:
+        yield ctx
+
+    finally:
+        ctx.close()
+
 
 @pytest.fixture
 def page(context): return context.new_page()
@@ -72,13 +113,17 @@ def api_client():
 
 @pytest.hookimpl(hookwrapper=True)
 def pytest_runtest_makereport(item, call):
-    outcome = yield; report = outcome.get_result()
+    outcome = yield; 
+    report = outcome.get_result()
     if report.when == "call" and report.failed:
         safe = re.sub(r"[^A-Za-z0-9_.-]+", "_", item.nodeid)
-        page_obj = item.funcargs.get("page"); ctx = item.funcargs.get("context")
+        page_obj = item.funcargs.get("page"); 
+        ctx = item.funcargs.get("context")
         if page_obj:
-            try: page_obj.screenshot(path=f"screenshots/{safe}.png", full_page=True)
+            try: 
+                page_obj.screenshot(path=f"screenshots/{safe}.png", full_page=True)
             except Exception: pass
         if ctx:
-            try: ctx.tracing.stop(path=f"traces/{safe}.zip")
+            try: 
+                ctx.tracing.stop(path=f"traces/{safe}.zip")
             except Exception: pass
